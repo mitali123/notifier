@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-notifier-deployment
+spec:
+  replicas: {{ .Values.replicas | default 3 }}
+  strategy:
+    type: {{ .Values.deployment.strategy }}
+    {{ .Values.deployment.strategyKey }}:
+      maxSurge: {{ .Values.deployment.maxSurge }}
+      maxUnavailable: {{ .Values.deployment.maxUnavailable }}
+  minReadySeconds: {{ .Values.deployment.minReadySeconds }}
+  progressDeadlineSeconds: {{ .Values.deployment.progressDeadlineSeconds }}    
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-notifier
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-notifier
+    spec: 
+      serviceAccountName: notifier-svc-account 
+      containers: 
+        - name: {{ .Release.Name }}-notifier
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}" 
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            requests:
+              cpu: {{ .Values.scaling.cpuMillicore }}          
+          env:  
+            - name: user 
+              value: {{ .Values.env.dbusername }} 
+            - name: password 
+              value: {{ .Values.env.dbpassword }}
+            - name: db 
+              value: {{ .Values.env.dbname }}
+            - name: host 
+              value: {{ .Values.env.dbhost }}
+            - name: broker1
+              value: {{ .Values.env.broker1 }} 
+            - name: broker2
+              value: {{ .Values.env.broker2 }} 
+            - name: broker3
+              value: {{ .Values.env.broker3 }}                               
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: {{ .Values.probe.liveness.initialDelay }}
+            timeoutSeconds: 30
+            periodSeconds: {{ .Values.probe.liveness.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3002
+            initialDelaySeconds: {{ .Values.probe.readiness.initialDelay }}  
+            timeoutSeconds: 30                          
+          ports: 
+            - containerPort: 3002        
+      imagePullSecrets: 
+        - name: regcred

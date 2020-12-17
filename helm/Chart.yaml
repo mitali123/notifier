@@ -1,0 +1,9 @@
+apiVersion: v2
+description: Helm Chart For Notifier
+maintainers:
+  - email: divyagirase90@gmail.com
+    name: Divya Girase
+  - email: manjarekarmitali1995@gmail.com
+    name: Mitali Manjarekar
+name: notifier
+version: 1.0.0   

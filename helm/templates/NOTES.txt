@@ -1,0 +1,21 @@
+* * * * * * * * * * * NOTIFIER HELM CHART * * * * * * * * * * * 
+									
+1. Set your secret 'regcred' for access to dockerhub		
+kubectl create secret docker-registry regcred \		
+--docker-server=https://index.docker.io/v1/ \			
+--docker-username=_username_ \					
+--docker-password=_password_ \				
+--docker-email=_email_							
+									
+2. Run your helm chart by giving required parameters			
+helm install _name_ ./helm/ \				    	
+--set image.tag=_GIT_HASH_, \					
+image.repository=_dockerusername/repo_,\				
+environment.dbusername=_dbuser_, \				
+environment.dbpassword=_dbpswd_, \				
+environment.dbname=_dbname_, \				
+environment.dbhost=_dbhost_, \				
+								
+* * * * * * * * * * * * * * * END * * * * * * * * * * * * * *
+
+
